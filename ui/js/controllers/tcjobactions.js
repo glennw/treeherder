@@ -18,9 +18,10 @@ treeherder.controller('TCJobActionsCtrl', function($scope, $http, $uibModalInsta
     $scope.triggerAction = function() {
         let task = _.clone($scope.input.selectedAction.task);
         // update the various date properties with evaluations
-        ['created', 'deadline', 'expires'].map(function(dateProp) {
-            task[dateProp] = thTaskcluster.fromNow(task[dateProp]['$fromNow']);
-        });
+        task = thTaskcluster.refreshTimestamps(task)
+        //['created', 'deadline', 'expires'].map(function(dateProp) {
+        // task[dateProp] = thTaskcluster.fromNow(task[dateProp]['$fromNow']);
+        //});
         task.payload.env['ACTION_INPUT'] = $scope.input.jsonPayload;
         task.payload.env['ACTION_PARAMETERS'] = null; // fixme: unclear what to set this to
         task.payload.env['ACTION_TASK'] = null; // fixme: what is this supposed to do?
