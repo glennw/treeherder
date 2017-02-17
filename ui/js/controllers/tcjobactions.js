@@ -31,7 +31,7 @@ treeherder.controller('TCJobActionsCtrl', function($scope, $http, $uibModalInsta
             task.payload.env['ACTION_TASK_GROUP_ID'] = response.data.taskGroupId;
             let tc = thTaskcluster.client();
             let queue = new tc.Queue();
-            let taskId = thTaskcluster.slugid();
+            let taskId = tc.slugid();
             queue.createTask(taskId, task).then(function() {
                 $scope.$apply(thNotify.send("Request sent to backfill jobs", 'success'));
             }, function(e) {
