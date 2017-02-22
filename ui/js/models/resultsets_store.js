@@ -949,6 +949,7 @@ treeherder.factory('ThResultSetStore', [
         }
 
         var getGeckoDecisionTaskID = function(repoName, resultsetId) {
+            let resultSet = getResultSet(repoName, resultsetId);
             let dtid = resultSet.geckoDecisionTaskID;
             // If we've retrieved it already, we can just return it again. Otherwise
             // try to find it. If it doesn't exist, we set it to an empty string.
