@@ -9,7 +9,7 @@ treeherder.controller('TCJobActionsCtrl', function($scope, $http, $uibModalInsta
 
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
-    };
+w    };
 
     $scope.updateSelectedAction = function(selectedAction) {
         $scope.input.jsonPayload = JSON.stringify(jsonSchemaDefaults($scope.input.selectedAction.schema), null, 4);
@@ -25,21 +25,22 @@ treeherder.controller('TCJobActionsCtrl', function($scope, $http, $uibModalInsta
         task.payload.env['ACTION_INPUT'] = $scope.input.jsonPayload;
         task.payload.env['ACTION_PARAMETERS'] = null; // fixme: unclear what to set this to
         task.payload.env['ACTION_TASK'] = null; // fixme: what is this supposed to do?
-        task.payload.env['ACTION_TASK_ID'] = job.taskId;
+        task.payload.env['ACTION_TASK_ID'] = JSON.stringify(job.taskId);
 
         $http.get('https://queue.taskcluster.net/v1/task/' + job.taskId).then(function(response) {
-            task.payload.env['ACTION_TASK_GROUP_ID'] = response.data.taskGroupId;
+            task.payload.env['ACTION_TASK_GROUP_ID'] = JSON.stringify(response.data.taskGroupId);
             let tc = thTaskcluster.client();
             let queue = new tc.Queue();
             let taskId = tc.slugid();
             queue.createTask(taskId, task).then(function() {
-                $scope.$apply(thNotify.send("Request sent to backfill jobs", 'success'));
+                $scope.$apply(thNotify.send("Custom action request sent successfully", 'success'));
+                $uibModalInstance.close('request sent');
             }, function(e) {
                 $scope.$apply(thNotify.send(ThTaskclusterErrors.format(e), 'danger', true));
+                $uibModalInstance.close('error');
             });
         });
     };
-    console.log(job);
     let decisionTaskGUID = ThResultSetStore.getGeckoDecisionTaskGUID(repoName, resultsetId);
     if (decisionTaskGUID) {
         ThJobDetailModel.getJobDetails(
