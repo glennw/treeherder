@@ -16,6 +16,8 @@ w    };
     };
 
     $scope.triggerAction = function() {
+        $scope.triggering = true;
+
         let task = _.clone($scope.input.selectedAction.task);
         // update the various date properties with evaluations
         task = thTaskcluster.refreshTimestamps(task)
@@ -34,13 +36,23 @@ w    };
             let taskId = tc.slugid();
             queue.createTask(taskId, task).then(function() {
                 $scope.$apply(thNotify.send("Custom action request sent successfully", 'success'));
+                $scope.triggering = false;
                 $uibModalInstance.close('request sent');
             }, function(e) {
                 $scope.$apply(thNotify.send(ThTaskclusterErrors.format(e), 'danger', true));
+                $scope.triggering = false;
                 $uibModalInstance.close('error');
             });
         });
     };
+
+    // prevent closing of dialog while we're triggering
+    $scope.$on('modal.closing', function(event) {
+        if ($scope.triggering) {
+            event.preventDefault();
+        }
+    });
+
     let decisionTaskGUID = ThResultSetStore.getGeckoDecisionTaskGUID(repoName, resultsetId);
     if (decisionTaskGUID) {
         ThJobDetailModel.getJobDetails(
